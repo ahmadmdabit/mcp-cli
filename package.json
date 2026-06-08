@@ -1,0 +1,33 @@
+{
+  "name": "mcp-cli",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist/cli.js",
+  "bin": "./dist/cli.js",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "build": "tsc",
+    "start": "node dist/cli.js",
+    "package": "node scripts/package.js --all --outdir ./build/Release",
+    "package:windows": "node scripts/package.js --windows-x64"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "commander": "^15.0.0",
+    "promisify-child-process": "^5.0.1"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.5",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^22.19.19",
+    "@typescript-eslint/eslint-plugin": "^8.60.1",
+    "@typescript-eslint/parser": "^8.60.1",
+    "eslint": "^10.4.1",
+    "typescript": "^6.0.3"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}
