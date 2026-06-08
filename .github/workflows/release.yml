@@ -38,6 +38,9 @@ jobs:
         with:
           bun-version: ${{ env.BUNVERSION }}
 
+      - name: Enable Corepack for Yarn 4
+        run: corepack enable
+
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
@@ -65,6 +68,9 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: ${{ env.BUNVERSION }}
+
+      - name: Enable Corepack for Yarn 4
+        run: corepack enable
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
