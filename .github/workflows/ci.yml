@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  BUNVERSION: "1.3.14"
+  NODEVERSION: "22.14.0"
+
+jobs:
+  lint-and-typecheck:
+    name: Lint & TypeCheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODEVERSION }}
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.BUNVERSION }}
+
+      - name: Enable Corepack for Yarn 4
+        run: |
+          corepack enable
+          yarn --version
+
+      - name: Get Yarn cache directory
+        id: yarn-cache-dir
+        run: echo "dir=$(yarn config get cacheFolder)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Yarn dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.yarn-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Lint
+        run: yarn lint
+
+      - name: TypeScript type check
+        run: yarn typecheck

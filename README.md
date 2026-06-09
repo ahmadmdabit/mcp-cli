@@ -131,12 +131,133 @@ flowchart TD
     Connect --> ExecuteCommand[Execute Requested CLI Command]
 ```
 
-## Prerequisites
+## Quick Start (Pre-built Binaries)
+
+No Node.js or development tools required. Download a standalone binary for your OS — it's a single file, ready to run.
+
+### Download Latest Release
+
+Each platform has a standalone binary and a compressed archive. Windows uses `.zip`; Linux and macOS use `.tar.gz`. SHA-256 checksums are provided for every file.
+
+| Platform                        | Archives                                                                                                                                                                                                                                      |
+| ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Windows** (x64)               | [`mcp-cli-windows-x64.exe`](https://github.com/ahmadmdabit/mcp-cli/releases/latest/download/mcp-cli-windows-x64.exe) · [`mcp-cli-windows-x64.zip`](https://github.com/ahmadmdabit/mcp-cli/releases/latest/download/mcp-cli-windows-x64.zip)   |
+| **Linux** (x64)                 | [`mcp-cli-linux-x64`](https://github.com/ahmadmdabit/mcp-cli/releases/latest/download/mcp-cli-linux-x64) · [`mcp-cli-linux-x64.tar.gz`](https://github.com/ahmadmdabit/mcp-cli/releases/latest/download/mcp-cli-linux-x64.tar.gz)             |
+| **Linux** (ARM64)               | [`mcp-cli-linux-arm64`](https://github.com/ahmadmdabit/mcp-cli/releases/latest/download/mcp-cli-linux-arm64) · [`mcp-cli-linux-arm64.tar.gz`](https://github.com/ahmadmdabit/mcp-cli/releases/latest/download/mcp-cli-linux-arm64.tar.gz)     |
+| **macOS** (Apple Silicon / M1+) | [`mcp-cli-darwin-arm64`](https://github.com/ahmadmdabit/mcp-cli/releases/latest/download/mcp-cli-darwin-arm64) · [`mcp-cli-darwin-arm64.tar.gz`](https://github.com/ahmadmdabit/mcp-cli/releases/latest/download/mcp-cli-darwin-arm64.tar.gz) |
+| **macOS** (Intel)               | [`mcp-cli-darwin-x64`](https://github.com/ahmadmdabit/mcp-cli/releases/latest/download/mcp-cli-darwin-x64) · [`mcp-cli-darwin-x64.tar.gz`](https://github.com/ahmadmdabit/mcp-cli/releases/latest/download/mcp-cli-darwin-x64.tar.gz)         |
+
+See the [full changelog](https://github.com/ahmadmdabit/mcp-cli/releases/latest) on GitHub Releases for version history and release notes.
+
+> **💡 Tip: Use the compressed archive to avoid OS security warnings.**
+> When you download a raw executable (`.exe`, or a binary with no extension), your operating system may show a security warning because the file isn't digitally signed:
+>
+> - **Windows SmartScreen** — "Windows protected your PC" / "Unrecognized app"
+> - **macOS Gatekeeper** — "cannot be opened because the developer cannot be verified"
+> - **Linux browsers** — may flag the download as potentially unsafe
+>
+> **The compressed archives (`.zip` / `.tar.gz`) bypass these warnings** because the OS sees them as regular archive files, not executables. Download the archive, extract it, and run the binary inside. On Windows, you may still need to right-click the `.exe` → **Properties** → check **"Unblock"** → **OK** the first time. On macOS, if you still see a warning after extracting, open **System Settings → Privacy & Security** and click **"Open Anyway"**.
+
+### First-time Setup
+
+After downloading, make it executable (Linux/macOS), create a config file, and run your first command:
+
+**Step 1 — Make the binary executable** (Linux/macOS only)
+
+You'll need to open your **Terminal** app.
+
+- **Linux**: press `Ctrl` + `Alt` + `T`, or search "Terminal" in your apps
+- **macOS**: press `Cmd` + `Space`, type "Terminal", and press Enter
+
+Then run (replace `<file>` with the name of the file you downloaded):
+
+```bash
+chmod +x <file>
+```
+
+> **What this does:** By default, downloaded files aren't marked as "runnable" on Linux and macOS. This command tells your operating system "yes, I trust this file, let me execute it."
+
+**Step 2 — Create your first config file**
+
+Using any text editor (Notepad, TextEdit, VS Code, nano, …), create a file called `config.json` in the same folder where you downloaded the binary.
+
+> **Can't create a `.json` file?** Your OS might hide file extensions. Try saving it as `config.json.txt`, then renaming it to remove the `.txt`. On Windows, enable "File name extensions" in File Explorer's View menu.
+
+**Running an MCP server on your machine (stdio):**
+
+```json
+{
+  "command": "npx",
+  "args": ["-y", "@modelcontextprotocol/server-everything"]
+}
+```
+
+**Connecting to a remote MCP server (HTTP):**
+
+```json
+{
+  "type": "http",
+  "url": "http://your-server-address:3001/mcp"
+}
+```
+
+> **Not sure which to use?** If you already have an MCP server running somewhere (e.g., in a Docker container, a cloud service, or a colleague gave you a URL), use the HTTP config above and replace the URL. If you want mcp-cli to launch the server for you, use the stdio config with `npx`.
+
+**Step 3 — Verify it works**
+
+Open your Terminal, navigate to the folder where you saved the binary and config file, then run:
+
+```bash
+# Windows (Command Prompt) — replace the filename with what you downloaded
+mcp-cli-windows-x64.exe -c config.json tools
+
+# Linux
+./mcp-cli-linux-x64 -c config.json tools
+
+# macOS
+./mcp-cli-darwin-arm64 -c config.json tools
+```
+
+> **"Command not found" or "Permission denied"?** Make sure you made the file executable (Step 1) and that you typed `./` before the filename on Linux/macOS.
+
+You should see a list of tools available from your MCP server — that means everything is working!
+
+### Making it Available Everywhere (Optional)
+
+You can run the binary from any folder by adding it to your system's PATH.
+
+**Windows**
+
+1. Move `mcp-cli-windows-x64.exe` to a permanent folder (e.g., `C:\Tools`)
+2. Press `Win` + `R`, type `sysdm.cpl`, press Enter
+3. Go to **Advanced** → **Environment Variables**
+4. Under **System variables**, find **Path**, click **Edit** → **New** → add `C:\Tools`
+5. Restart your terminal
+
+**Linux**
+
+```bash
+sudo mv mcp-cli-linux-x64 /usr/local/bin/mcp-cli
+```
+
+Now you can use `mcp-cli` from any folder.
+
+**macOS**
+
+```bash
+sudo mv mcp-cli-darwin-arm64 /usr/local/bin/mcp-cli
+```
+
+> **Why do this?** Without this step, you'd need to type the full path to the binary every time (e.g., `/home/user/Downloads/mcp-cli-linux-x64`). After adding it to PATH, you can just type `mcp-cli` from anywhere.
+
+---
+
+## Prerequisites (Building from Source)
 
 - Node.js version 22.0.0 or higher.
 - yarn, npm, or pnpm (yarn is recommended — the project ships with a `yarn.lock`).
 
-## Installation
+## Installation (Building from Source)
 
 1. Clone the repository or download the source files.
 2. Install dependencies:
@@ -350,6 +471,117 @@ PowerShell interprets a leading `{` as the start of a script block, which strips
 # Escape inner quotes
 node dist/cli.js -c config.json call echo -a '{\"message\": \"Hello, MCP World!\"}'
 ```
+
+## Everyday Usage Guide
+
+This section walks through common scenarios in plain language — no deep technical knowledge required.
+
+### "I just want to see what my MCP server can do"
+
+Run this to get a list of everything the server offers:
+
+```bash
+mcp-cli -c config.json tools
+```
+
+You'll see a list of **tools** (actions the server can perform) with names and descriptions. Think of it like browsing a menu at a restaurant — these are all the things you can order.
+
+### "I want to run a specific tool"
+
+Once you've found a tool name from the list above, you can call it:
+
+```bash
+mcp-cli -c config.json call <tool-name>
+```
+
+Many tools need extra information (called **arguments**). For example, an "echo" tool needs to know _what_ to echo. You pass those as a JSON string:
+
+```bash
+mcp-cli -c config.json call echo -a '{"message": "Hello!"}'
+```
+
+> **Tip:** If you get a "too many arguments" error, see the [Quoting](#quoting-on-windows-command-prompt) section above for your platform.
+
+### "I want to read a file or document from the server"
+
+Some servers expose **resources** — files, documents, or data you can fetch:
+
+```bash
+# First, see what's available
+mcp-cli -c config.json resources
+
+# Then read a specific one by its URI
+mcp-cli -c config.json read "some://resource-uri"
+```
+
+### "I want human-readable output instead of JSON"
+
+By default, results are in JSON (great for scripts). For reading in a terminal, add `--format text` (or `-f text`):
+
+```bash
+mcp-cli -c config.json -f text call echo -a '{"message": "Hello!"}'
+```
+
+This prints just the plain text result instead of the full JSON structure.
+
+### "I want to extract just one piece of the result"
+
+Use `--select` to pull out a specific part — no need for `jq`:
+
+```bash
+# Get only the text from the first result
+mcp-cli -c config.json --select "content[0].text" call echo -a '{"message": "Hello!"}'
+
+# Get all tool names only
+mcp-cli -c config.json --select "tools[*].name" tools
+```
+
+### "I'm running the same commands repeatedly and it's slow"
+
+Starting a **daemon** keeps the connection alive in the background so you don't re-connect every time:
+
+```bash
+# Start the daemon (keeps running in the background)
+mcp-cli -c config.json --daemon
+
+# Now in another terminal, run commands through the daemon — much faster
+mcp-cli -c config.json -s tools
+mcp-cli -c config.json -s call echo -a '{"message": "Hello!"}'
+```
+
+The daemon automatically shuts down after 6 minutes of inactivity.
+
+### "Something went wrong — how do I get more details?"
+
+Use `--log-level debug` to see what's happening behind the scenes:
+
+```bash
+mcp-cli -c config.json --log-level debug call echo -a '{"message": "test"}'
+```
+
+This prints detailed connection and protocol info to stderr while keeping your normal output clean.
+
+### "I want to pipe the output to another program"
+
+Use `-f json` (the default) and pipe to `jq` or any other tool:
+
+```bash
+mcp-cli -c config.json call echo -a '{"message": "Hello!"}' | jq '.content[0].text'
+```
+
+### Quick Reference
+
+| What you want to do                    | Command                                                 |
+| -------------------------------------- | ------------------------------------------------------- |
+| See all tools                          | `mcp-cli -c config.json tools`                          |
+| See all resources                      | `mcp-cli -c config.json resources`                      |
+| Call a tool                            | `mcp-cli -c config.json call <name> -a '<json-args>'`   |
+| Read a resource                        | `mcp-cli -c config.json read <uri>`                     |
+| Human-readable output                  | add `-f text` to any command                            |
+| Extract part of a result               | add `--select "<path>"` to any command                  |
+| Run commands faster (reuse connection) | start daemon with `--daemon`, then add `-s` to commands |
+| Debug a problem                        | add `--log-level debug` to any command                  |
+| See all options                        | `mcp-cli --help`                                        |
 
 ## Daemon Mode (Stateful Sessions)
 
@@ -629,15 +861,22 @@ The `.yarnrc.yml` file configures cross-platform architecture support (`win32`, 
 
 ### Pre-built Binaries
 
-Pre-built binaries for supported platforms may already be present in the `build/Release/` directory (or downloaded from [GitHub Releases](https://github.com/ahmadmdabit/mcp-cli/releases)). These require no Node.js or Bun installation and can be used directly.
+Pre-built binaries for supported platforms may already be present in the `build/Release/` directory. See [Quick Start](#quick-start-pre-built-binaries) above for direct download links from GitHub Releases. These require no Node.js or Bun installation and can be used directly.
 
 ## Continuous Integration
 
-The repository includes a [GitHub Actions workflow](.github/workflows/release.yml) that:
+The repository uses two GitHub Actions workflows:
 
-1. Runs linting and TypeScript type checking on every push and pull request.
-2. Builds TypeScript and packages standalone binaries for all 5 supported platforms in a single job via `yarn package` (internally `scripts/package.js --all`), which uses Bun's cross-compilation (`bun build --compile --target=...`) to produce all platform binaries from one runner.
-3. Creates a GitHub release with all binaries and SHA-256 checksums when a tag matching `v*.*.*` is pushed.
+**[CI](.github/workflows/ci.yml)** — runs on every push and pull request:
+
+- Runs ESLint and TypeScript type checking.
+
+**[Release](.github/workflows/release.yml)** — runs automatically after CI passes on a version tag (`v*.*.*`):
+
+- Builds TypeScript and packages standalone binaries for all 5 supported platforms via `yarn package` (Bun `--compile` cross-compilation).
+- Compresses each binary — `.zip` for Windows, `.tar.gz` for Linux and macOS.
+- Generates SHA-256 checksums for every artifact.
+- Creates a **public** GitHub release with all assets, an auto-generated changelog since the previous tag, and a full commit history link. Pre-release suffixes (e.g. `-beta`, `-rc1`) are marked automatically.
 
 ## License
 
